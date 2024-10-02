@@ -1,0 +1,77 @@
+@mixin custom-radio {
+  appearance: none;
+  border: 2px solid #000;
+  width: 17px;
+  height: 17px;
+  border-radius: 100%;
+  position: relative;
+
+  &:checked {
+    &::before {
+      content: "";
+      position: absolute;
+      transform: translate(45%, 45%);
+      width: 7px;
+      height: 7px;
+      background-color: #000;
+      border-radius: 100%;
+    }
+  }
+}
+
+@mixin librarycard-auth-buttons {
+  text-align: center;
+  align-content: center;
+  font-family: $inter;
+  font-weight: bold;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 1px;
+  border: 1px $dark solid;
+  border-radius: 2px;
+  width: 75px;
+  height: 30px;
+  background-color: $white;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $sand;
+    color: $sand;
+  }
+}
+
+@mixin cardcheck-input {
+  border-radius: 10px;
+  border: none;
+  color: $sand;
+  font-family: $forum;
+  font-size: 30px;
+  line-height: 50px;
+  letter-spacing: 2%;
+  padding: 8px 20px;
+  &::placeholder {
+      color: $grey;
+  }
+}
+
+@mixin cardcheck-button {
+  width: 242px;
+  height: 44px;
+  align-self: center;
+  color: $dark;
+  border-radius: 2px;
+  font-family: $inter;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 24px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  
+  &:hover {
+      border-color: $sand;
+      color: $sand;
+  }
+  &.active {
+      display: none;
+  }
+}
