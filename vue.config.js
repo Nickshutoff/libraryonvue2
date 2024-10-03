@@ -11,5 +11,6 @@ module.exports = defineConfig({
         path.resolve(__dirname, './src/assets/styles/main.scss')
       ]
     }
-  }
+  },
+  publicPath: '/libraryonvue2/'
 })
