@@ -1,19 +1,19 @@
 <template>
   <div class="profile">
     <div class="profile-visits">
-        <h6>Visits</h6>
+        <h6>{{ text.visits }}</h6>
         <img :src="visitsIcon.src" :alt="visitsIcon.alt">
         <span v-if="isUser" class="user-visits-counter">{{ currentUser.visitsCount }}</span>
         <span v-else class="user-visits-counter">{{ checkedUser?.visitsCount }}</span>
     </div>
     <div class="profile-bonuses">
-        <h6>Bonuses</h6>
+        <h6>{{ text.bonuses }}</h6>
         <img :src="bonusesIcon.src" :alt="bonusesIcon.src">
         <span v-if="isUser" class="user-bonuses-counter">{{ currentUser.bonuses }}</span>
         <span v-else class="user-bonuses-counter">{{ checkedUser?.bonuses }}</span>
     </div>
     <div class="profile-books">
-        <h6>Books</h6>
+        <h6>{{ text.books }}</h6>
         <img :src="booksIcon.src" :alt="booksIcon.alt">
         <span v-if="isUser" class="user-books-counter"> {{ currentUser.booksRent.length }} </span>
         <span v-else class="user-books-counter"> {{ checkedUser?.booksRent.length }} </span>
@@ -41,6 +41,11 @@ export default {
         src: booksIcon,
         alt: "books_icon",
       },
+      text: {
+        visits: 'Visits',
+        bonuses: 'Bonuses',
+        books: 'Books'
+      }
     }
   },
   props: {

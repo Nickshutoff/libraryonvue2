@@ -1,18 +1,24 @@
 <template>
-  <transition name="fade" appear>
-    <div class="modal__log-in" v-clickaway="toggleModalLogin">
-      <span class="log-in__text">LOGIN</span>
+  <transition name="fade">
+    <div v-if="isModalLoginOpen" class="modal__log-in" v-clickaway="toggleModalLogin">
+      <span class="log-in__text">{{ text.header }}</span>
       <img @click="toggleModalLogin" :src="closeBtn.src" :alt="closeBtn.alt" class="log-in__close" />
       <form @submit.prevent="handleLogin" class="log-in__field" id="login">
-        <label for="e-mail">E-mail or readers card</label>
-        <input type="text" autocomplete="email" v-model="email" id="e-mail" required />
-        <label for="password">Password</label>
-        <input type="password" v-model="password" id="login_password" required />
+        <label for="e-mail">{{ text.label.email }}</label>
+        <input type="text" autocomplete="email" v-model="emailOrCard" id="e-mail" />
+
+        <label for="password">{{ text.label.password }}</label>
+        <input type="password" v-model="password" id="login_password" />
+
+        <transition name="fade">
+          <span v-if="errorMessage">{{ errorMessage }}</span>
+        </transition>
+
         <input class="log-in__button" type="submit" value="Log in" />
       </form>
       <div class="log-in__register">
-        <span>Don't have an account?</span>
-        <a @click.prevent="toggleModalRegister">Register</a>
+        <span>{{ text.toRegister.text }}</span>
+        <a @click.prevent="toggleModalRegister">{{ text.toRegister.link }}</a>
       </div>
     </div>
   </transition>
@@ -21,7 +27,7 @@
 <script>
 import closeBtn from "@/assets/img/icons/close_btn.svg";
 import { directive as clickaway } from "vue-clickaway";
-import { getUserData, setUserData } from "@/store";
+import { getUserData, setUserData, getUserDataByCardAndPassword } from "@/store";
 
 export default {
   components: {
@@ -36,9 +42,21 @@ export default {
         src: closeBtn,
         alt: "close_button",
       },
-      email: '',
-      password: ''
-    };
+      text: {
+        header: 'LOGIN',
+        label: {
+          email: 'E-mail or readers card',
+          password: 'Password'
+        },
+        toRegister: {
+          text: "Don't have an account?",
+          link: 'Register'
+        }
+      },
+      emailOrCard: '',
+      password: '',
+      errorMessage: ''
+    }
   },
   props: {
     isModalLoginOpen: {
@@ -51,15 +69,40 @@ export default {
     },
   },
   methods: {
-    handleLogin() {
-      const user = getUserData(this.email, this.password)
-      if (user.email == this.email && user.password == this.password) {
-        this.$emit('is-user')
-        this.$emit('logged-in', user)
-        user.visitsCount++
-        setUserData(user.email, user)
+    async handleLogin() {
+      const regexpEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+      let user = null
+      try {
+        if (!this.emailOrCard || !this.password) {
+          throw new Error("Please fill up all the required fields")
+        }
+
+        if (regexpEmail.test(this.emailOrCard)) {
+          user = getUserData(this.emailOrCard)
+        } else {
+          user = getUserDataByCardAndPassword(this.emailOrCard, this.password)
+        }
+
+        if (!user) {
+          throw new Error("Invalid e-mail / number or password")
+        }
+
+        if (user.password === this.password) {
+          this.$emit('is-user')
+          this.$emit('logged-in', user)
+          user.visitsCount++
+          setUserData(user.email, user)
+          this.toggleModalLogin()
+        } else {
+          throw new Error("Invalid password")
+        }
+      } catch (error) {
+        this.errorMessage = error.message
+        setTimeout(() => {
+          this.errorMessage = ''
+        }, 3000)
+        return
       }
-      this.toggleModalLogin()
     },
     toggleModalRegister() {
       this.$emit('toggle-modal-register')
@@ -78,7 +121,7 @@ export default {
   transition: opacity 0.5s ease;
 }
 
-.fade-enter-from,
+.fade-enter,
 .fade-leave-to {
   opacity: 0;
 }
@@ -92,7 +135,7 @@ export default {
   transform: translate(-50%, -50%);
   width: 250px;
   padding: 20px 25px;
-  z-index: 502;
+  z-index: 15;
   background-color: $white;
   color: $black;
   font-family: $inter;
@@ -126,7 +169,17 @@ export default {
       width: 100%;
     }
 
+    span {
+      position: absolute;
+      top: 176px;
+      font-size: 12px;
+      color: red;
+    }
+
     .log-in__button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background-color: $white;
       border-color: $black;
       margin-top: 10px;

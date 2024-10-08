@@ -1,44 +1,49 @@
 <template>
-  <div class="modal__profile" v-clickaway="toggleModalProfile">
-    <img @click="toggleModalProfile" :src="closeBtn.src" :alt="closeBtn.alt" class="profile__close">
-    <div class="profile__user">
-      <div class="icon__auth">{{ currentUser.initials }}</div>
-      <div class="user-full-name">{{ currentUser.fullName }}</div>
+  <transition name="fade">
+    <div v-if="isModalProfileOpen" class="modal__profile" v-clickaway="toggleModalProfile">
+      <img @click="toggleModalProfile" :src="closeBtn.src" :alt="closeBtn.alt" class="profile__close">
+      <div class="profile__user">
+        <div class="icon__auth">{{ currentUser.initials }}</div>
+        <div class="user-full-name">{{ currentUser.fullName }}</div>
+      </div>
+      <div class="profile__info">
+        <span class="profile-title">MY PROFILE</span>
+        <div class="profile-statistics">
+          <div class="profile-visits">
+            <h6>Visits</h6>
+            <img :src="visitsIcon.src" :alt="visitsIcon.alt">
+            <span class="user-visits-counter">{{ currentUser.visitsCount }}</span>
+          </div>
+          <div class="profile-bonuses">
+            <h6>Bonuses</h6>
+            <img :src="bonusesIcon.src" :alt="bonusesIcon.src">
+            <span class="user-bonuses-counter">{{ currentUser.bonuses }}</span>
+          </div>
+          <div class="profile-books">
+            <h6>Books</h6>
+            <img :src="booksIcon.src" :alt="booksIcon.alt">
+            <span class="user-books-counter"> {{ currentUser.booksRent.length }} </span>
+          </div>
+        </div>
+        <div class="profile-rented">
+          <h6>Rented books</h6>
+          <ul class="rented-list">
+            <li v-for="book in currentUser.booksRent" :key="book.index">
+              {{ book.title }}, {{ book.author.replace('By ', '') }}
+            </li>
+          </ul>
+        </div>
+        <div class="profile-card-number">
+          <h6>Card number</h6>
+          <span class="user-card-number">{{ currentUser.readersCard }}</span>
+          <img @click="copyReadersCard" :src="copyBtn.src" :alt="copyBtn.alt">
+          <transition name="fade">
+            <span v-if="copied">copied!</span>
+          </transition>
+        </div>
+      </div>
     </div>
-    <div class="profile__info">
-      <span class="profile-title">MY PROFILE</span>
-      <div class="profile-statistics">
-        <div class="profile-visits">
-          <h6>Visits</h6>
-          <img :src="visitsIcon.src" :alt="visitsIcon.alt">
-          <span class="user-visits-counter">{{ currentUser.visitsCount }}</span>
-        </div>
-        <div class="profile-bonuses">
-          <h6>Bonuses</h6>
-          <img :src="bonusesIcon.src" :alt="bonusesIcon.src">
-          <span class="user-bonuses-counter">{{ currentUser.bonuses }}</span>
-        </div>
-        <div class="profile-books">
-          <h6>Books</h6>
-          <img :src="booksIcon.src" :alt="booksIcon.alt">
-          <span class="user-books-counter"> {{ currentUser.booksRent.length }} </span>
-        </div>
-      </div>
-      <div class="profile-rented">
-        <h6>Rented books</h6>
-        <ul class="rented-list">
-          <li v-for="book in currentUser.booksRent" :key="book.index">
-            {{ book.title }}, {{ book.author.replace('By ', '') }}
-          </li>
-        </ul>
-      </div>
-      <div class="profile-card-number">
-        <h6>Card number</h6>
-        <span class="user-card-number">{{ currentUser.readersCard }}</span>
-        <img :src="copyBtn.src" :alt="copyBtn.alt">
-      </div>
-    </div>
-  </div>
+  </transition>
 </template>
 
 <script>
@@ -74,7 +79,8 @@ export default {
       copyBtn: {
         src: copyBtn,
         alt: "copy_button"
-      }
+      },
+      copied: false
     }
   },
   props: {
@@ -90,12 +96,29 @@ export default {
   methods: {
     toggleModalProfile() {
       this.$emit('toggle-modal-profile')
+    },
+    copyReadersCard() {
+      navigator.clipboard.writeText(this.currentUser?.readersCard)
+      this.copied = true
+      setTimeout(() => {
+        this.copied = false
+      }, 3000)
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .modal__profile {
   display: flex;
   position: fixed;
@@ -104,7 +127,7 @@ export default {
   transform: translate(-50%, -50%);
   width: 600px;
   height: 400px;
-  z-index: 502;
+  z-index: 15;
   background-color: $white;
   color: $black;
 
@@ -128,10 +151,11 @@ export default {
     line-height: 20px;
 
     .icon__auth {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 80px;
       height: 80px;
-      text-align: center;
-      align-content: center;
       background-color: $white;
       color: $sand;
     }

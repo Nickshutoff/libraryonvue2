@@ -1,27 +1,33 @@
 <template>
-  <div class="modal__register" v-clickaway="toggleModalRegister">
-    <span class="register__header">REGISTER</span>
-    <img @click.prevent="toggleModalRegister" :src="closeBtn.src" :alt="closeBtn.alt" />
-    <form class="register__field" @submit.prevent="handleRegister">
-      <label for="first-name">First name</label>
-      <input type="text" id="first-name" v-model="firstName" required />
+  <transition name="fade">
+    <div v-if="isModalRegisterOpen" class="modal__register" v-clickaway="toggleModalRegister">
+      <span class="register__header">{{ text.header }}</span>
+      <img @click.prevent="toggleModalRegister" :src="closeBtn.src" :alt="closeBtn.alt" />
+      <form class="register__field" @submit.prevent="handleRegister">
+        <label for="first-name">{{ text.label.firstName }}</label>
+        <input type="text" id="first-name" v-model="firstName" />
+  
+        <label for="last-name">{{ text.label.lastName }}</label>
+        <input type="text" id="last-name" v-model="lastName" />
+  
+        <label for="e-mail">{{ text.label.email }}</label>
+        <input type="email" id="e-mail" v-model="email" />
+  
+        <label for="password">{{ text.label.password }}</label>
+        <input type="password" id="password" v-model="password" />
 
-      <label for="last-name">Last name</label>
-      <input type="text" id="last-name" v-model="lastName" required />
-
-      <label for="e-mail">E-mail</label>
-      <input type="email" id="e-mail" v-model="email" required />
-
-      <label for="password">Password</label>
-      <input type="password" id="password" v-model="password" required />
-
-      <input class="register__button" type="submit" value="Sign up" />
-    </form>
-    <div class="register__log-in">
-      <span>Already have an account?</span>
-      <a @click.prevent="toggleModalLogin" class="profile__log-in">Login</a>
+        <transition name="fade">
+          <span v-if="errorMessage">{{ errorMessage }}</span>
+        </transition>
+  
+        <input class="register__button" type="submit" value="Sign up" />
+      </form>
+      <div class="register__log-in">
+        <span>{{ text.toLogin.text }}</span>
+        <a @click.prevent="toggleModalLogin" class="profile__log-in">{{ text.toLogin.link }}</a>
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script>
@@ -42,10 +48,24 @@ export default {
         src: closeBtn,
         alt: "close_btn",
       },
+      text: {
+        header: 'REGISTER',
+        label: {
+          firstName: 'First name',
+          lastName: 'Last name',
+          email: 'E-mail',
+          password: 'Password'
+        },
+        toLogin: {
+          text: 'Already have an account?',
+          link: 'Login'
+        }
+      },
       firstName: '',
       lastName: '',
       email: '',
-      password: ''
+      password: '',
+      errorMessage: ''
     }
   },
   props: {
@@ -55,9 +75,35 @@ export default {
     }
   },
   methods: {
-    handleRegister() {
-      registerNewUser(this.firstName, this.lastName, this.email, this.password);
-      this.toggleModalRegister()
+    async handleRegister() {
+      try {
+        const usersData = await getUsersData()
+        const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+        if (!this.firstName || !this.lastName) {
+          throw new Error("Please enter your name")
+        }
+        if (usersData[this.email]) {
+          throw new Error("E-mail already exists")
+        }
+        if (!this.email) {
+          throw new Error('Please enter your e-mail')
+        }
+        if (!emailRegex.test(this.email)) {
+          throw new Error("Invalid e-mail format")
+        }
+        if (this.password.length < 8) {
+          throw new Error("Password is too short")
+        }
+        const newUser = new User(this.firstName, this.lastName, this.email, this.password)
+        await setUserData(this.email, newUser)
+        this.toggleModalRegister()
+      }
+      catch(error) {
+        this.errorMessage = error.message
+        setTimeout(() => {
+          this.errorMessage = ''
+        }, 3000)
+      }
     },
     toggleModalLogin() {
       this.$emit('toggle-modal-login')
@@ -68,26 +114,19 @@ export default {
     }
   }
 }
-
-function registerNewUser(firstName, lastName, email, password) {
-  const usersData = getUsersData()
-
-  if (usersData[email]) {
-    alert("E-mail already exists")
-    return
-  }
-
-  if (password.length < 8) {
-    alert("Password must contain at least 8 symbols")
-    return
-  }
-
-  const newUser = new User(firstName, lastName, email, password)
-  setUserData(email, newUser)
-}
 </script>
 
 <style lang="scss" scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .modal__register {
   display: flex;
   flex-direction: column;
@@ -97,7 +136,7 @@ function registerNewUser(firstName, lastName, email, password) {
   transform: translate(-50%, -50%);
   width: 250px;
   padding: 20px 25px;
-  z-index: 501;
+  z-index: 15;
   background-color: $white;
   color: $black;
   font-family: $inter;
@@ -131,7 +170,17 @@ function registerNewUser(firstName, lastName, email, password) {
       width: 100%;
     }
 
+    span {
+      position: absolute;
+      top: 298px;
+      font-size: 12px;
+      color: red;
+    }
+
     .register__button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background-color: $white;
       border-color: $black;
       margin-top: 10px;

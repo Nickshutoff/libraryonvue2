@@ -20,8 +20,9 @@
 }
 
 @mixin librarycard-auth-buttons {
-  text-align: center;
-  align-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: $inter;
   font-weight: bold;
   font-size: 10px;
@@ -70,8 +71,5 @@
   &:hover {
       border-color: $sand;
       color: $sand;
-  }
-  &.active {
-      display: none;
   }
 }

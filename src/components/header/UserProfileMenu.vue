@@ -83,6 +83,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.slide-enter-active,
+.slide-leave-active {
+  transform: translateY(0);
+}
+
+.slide-enter,
+.slide-leave-to {
+  transform: translateY(-200%);
+}
+
 .profile-menu {
   display: flex;
   flex-direction: column;
@@ -93,7 +103,7 @@ export default {
   width: 80px;
   height: 115px;
   padding: 5px 0px;
-  z-index: 16;
+  z-index: 5;
   background-color: $white;
   font-size: 15px;
   font-family: $inter;
@@ -137,15 +147,5 @@ export default {
       }
     }
   }
-}
-
-.slide-enter-active,
-.slide-leave-active {
-  transform: translateY(0);
-}
-
-.slide-enter,
-.slide-leave-to {
-  transform: translateY(-200%);
 }
 </style>

@@ -6,12 +6,8 @@
       @logged-out="loggedOut"
       :is-profile-menu-open="isProfileMenuOpen"
       @toggle-profile-menu="toggleProfileMenu"
-      :is-any-modal-open="isAnyModalOpen"
-      :is-modal-register-open="isModalRegisterOpen"
       @toggle-modal-register="toggleModalRegister" 
-      :is-modal-login-open="isModalLoginOpen"
       @toggle-modal-login="toggleModalLogin"
-      :is-modal-profile-open="isModalProfileOpen"
       @toggle-modal-profile="toggleModalProfile"/>
     <WelcomeContainer />
     <AboutContainer />
@@ -35,27 +31,23 @@
       :is-modal-profile-open="isModalProfileOpen"
       @toggle-modal-profile="toggleModalProfile"/>
     <FooterContainer />
-    <Background 
-      v-if="isAnyModalOpen"/>
+    <Background
+      :is-any-modal-open="isAnyModalOpen"/>
     <RegisterWindow
-      v-if="isModalRegisterOpen"
       :is-modal-register-open="isModalRegisterOpen"
       @toggle-modal-register="toggleModalRegister" 
       @toggle-modal-login="toggleModalLogin"/>
-    <LoginWindow 
-      v-if="isModalLoginOpen" 
+    <LoginWindow
       :is-user="isUser"
       @logged-in="loggedIn"
       :is-modal-login-open="isModalLoginOpen"
       @toggle-modal-login="toggleModalLogin" 
       @toggle-modal-register="toggleModalRegister"/>
-    <ProfileWindow 
-      v-if="isModalProfileOpen"
+    <ProfileWindow
       :current-user="currentUser"
       :is-modal-profile-open="isModalProfileOpen"
       @toggle-modal-profile="toggleModalProfile" />
     <PurchaseWindow
-      v-if="isModalPurchaseOpen" 
       :currentUser="currentUser"
       :is-modal-purchase-open="isModalPurchaseOpen"
       @toggle-modal-purchase="toggleModalPurchase" />

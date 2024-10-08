@@ -5,7 +5,7 @@
 <style lang="scss" scoped>
 .linear-gradient {
   position: absolute;
-  z-index: 5;
+  z-index: 2;
   top: 0;
   left: 0;
   width: 100%;

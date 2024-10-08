@@ -11,6 +11,16 @@ export function getUserData(userId) {
   return usersData[userId]
 }
 
+export function getUserDataByCardAndPassword(readersCard, password) {
+  let usersData = getUsersData()
+  for (let userId in usersData) {
+    if (usersData[userId].readersCard === readersCard && usersData[userId].password === password) {
+      return usersData[userId]
+    }
+  }
+  return null
+}
+
 export function getUserDataByNameAndCard(fullName, readersCard) {
   let usersData = getUsersData()
   for (let userId in usersData) {
@@ -18,6 +28,7 @@ export function getUserDataByNameAndCard(fullName, readersCard) {
       return usersData[userId]
     }
   }
+  return null
 }
 
 export function setUserData(userId, userData) {

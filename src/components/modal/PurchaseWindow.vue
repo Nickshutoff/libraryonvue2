@@ -1,48 +1,52 @@
 <template>
-  <div class="modal__buy" v-clickaway="toggleModalPurchase">
-    <img @click="toggleModalPurchase" :src="closeBtn.src" :alt="closeBtn.alt" class="buy__close">
-    <span class="buy__text">BUY A LIBRARY CARD</span>
-    <div class="buy__content">
-      <form class="buy__form" id="buy" @submit.prevent="handlePurchase">
-        <div class="buy__row">
-          <label for="bank-card-number">Bank card number</label>
-          <input v-model="cardNumber" type="number" id="bank-card-number" maxlength="16" required>
-        </div>
-        <div class="buy__row">
-          <label for="bank-card-exp">Expiration code</label>
-          <div class="buy__row__exp-inputs">
-            <input v-model="cardMonth" type="number" id="bank-card-exp-code-month" pattern="[0-9]{2}" maxlength="2" required>
-            <input v-model="cardYear" type="number" id="bank-card-exp-code-year" pattern="[0-9]{2}" maxlength="2" required>
+  <transition name="fade">
+    <div v-if="isModalPurchaseOpen" class="modal__buy" v-clickaway="toggleModalPurchase">
+      <img @click="toggleModalPurchase" :src="closeBtn.src" :alt="closeBtn.alt" class="buy__close">
+      <span class="buy__text">{{ text.header }}</span>
+      <div class="buy__content">
+        <form class="buy__form" id="buy" @submit.prevent="handlePurchase">
+          <div class="buy__row">
+            <label for="bank-card-number">{{ text.label.cardNumber }}</label>
+            <input v-model="cardNumber" type="number" id="bank-card-number" minlength="16" maxlength="16" required>
           </div>
-        </div>
-        <div class="buy__row cvc">
-          <label for="bank-card-cvc">CVC</label>
-          <input v-model="cardCvc" type="number" id="bank-card-cvc" pattern="[0-9]{3}" required>
-        </div>
-        <div class="buy__row second">
-          <label for="bank-card-name">Cardholder name</label>
-          <input v-model="holdersName" type="text" id="bank-card-name" required>
-        </div>
-        <div class="buy__row">
-          <label for="bank-postal-code">Postal code</label>
-          <input v-model="postalCode" type="number" id="bank-postal-code" pattern="[0-9]{6}" required>
-        </div>
-        <div class="buy__row">
-          <label for="bank-city">City / Town</label>
-          <input v-model="city" type="text" id="bank-city" required>
-        </div>
-        <div class="buy__row__submit">
-          <input class="buy__button" type="submit" value="Buy">
-          <span class="buy__price">$ 25.00</span>
-        </div>
-      </form>
-      <span class="buy__info">
-        If you are live, work, attend school, or pay property taxes in New York State, you can get a $25 digital
-        library card right now using this online form. Visitors to New York State can also use this form to
-        apply for a temporary card.
-      </span>
+
+          <div class="buy__row">
+            <label for="bank-card-exp">{{ text.label.expiration }}</label>
+            <div class="buy__row__exp-inputs">
+              <input v-model="cardMonth" type="number" id="bank-card-exp-code-month" pattern="[0-9]{2}" maxlength="2" required>
+              <input v-model="cardYear" type="number" id="bank-card-exp-code-year" pattern="[0-9]{2}" maxlength="2" required>
+            </div>
+          </div>
+
+          <div class="buy__row cvc">
+            <label for="bank-card-cvc">{{ text.label.cvc }}</label>
+            <input v-model="cardCvc" type="number" id="bank-card-cvc" pattern="[0-9]{3}" minlength="3" maxlength="3" required>
+          </div>
+
+          <div class="buy__row second">
+            <label for="bank-card-name">{{ text.label.holdersName }}</label>
+            <input v-model="holdersName" type="text" id="bank-card-name" required>
+          </div>
+
+          <div class="buy__row">
+            <label for="bank-postal-code">{{ text.label.postalCode }}</label>
+            <input v-model="postalCode" type="number" id="bank-postal-code" pattern="[0-9]{6}" required>
+          </div>
+
+          <div class="buy__row">
+            <label for="bank-city">{{ text.label.city }}</label>
+            <input v-model="city" type="text" id="bank-city" required>
+          </div>
+
+          <div class="buy__row__submit">
+            <input class="buy__button" type="submit" value="Buy">
+            <span class="buy__price">{{ text.price }}</span>
+          </div>
+        </form>
+        <span class="buy__info">{{ text.info }}</span>
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script>
@@ -59,6 +63,19 @@ export default {
       closeBtn: {
         src: closeBtn,
         alt: "close_button"
+      },
+      text: {
+        header: 'BUY A LIBRARY CARD',
+        label: {
+          cardNumber: 'Bank card number',
+          expiration: 'Expiration code',
+          cvc: 'CVC',
+          holdersName: 'Cardholder name',
+          postalCode: 'Postal code',
+          city: 'City / Town',
+        },
+        price: '$ 25.00',
+        info: 'If you are live, work, attend school, or pay property taxes in New York State, you can get a $25 digital library card right now using this online form. Visitors to New York State can also use this form to apply for a temporary card.'
       },
       cardNumber: '',
       cardMonth: '',
@@ -104,6 +121,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .modal__buy {
   display: flex;
   flex-direction: column;
@@ -113,13 +140,9 @@ export default {
   transform: translate(-50%, -50%);
   width: 650px;
   height: 540px;
-  z-index: 502;
+  z-index: 15;
   background-color: $white;
   color: $black;
-
-  &.active {
-    display: flex;
-  }
 
   .buy__close {
     position: absolute;
@@ -207,6 +230,9 @@ export default {
       }
 
       .buy__button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background-color: $white;
         margin-top: 10px;
         width: 75px;

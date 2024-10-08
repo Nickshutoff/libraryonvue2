@@ -1,7 +1,7 @@
 <template>
   <div class="cardcheck">
     <h4 class="cardcheck-title">{{ text.title }}</h4>
-    <form class="cardcheck-form" @submit.prevent="handleCardcheck">
+    <form class="cardcheck-form" :class="{ error: error }" @submit.prevent="handleCardcheck">
       <div class="cardcheck-form-wrapper">
         <p>{{ text.subtitle }}</p>
         <div class="cardcheck-form-field">
@@ -24,7 +24,7 @@
         :is-user="isUser" 
         :current-user="currentUser" 
         :checked-user="checkedUser" />
-      <button v-else type="submit" class="cardcheck-form-button">
+      <button v-else type="submit" class="cardcheck-form-button" :class="{ error: error }">
         {{ text.buttontext }}
       </button>
     </form>
@@ -48,7 +48,8 @@ export default {
       },
       fullName: "",
       readersCard: "",
-      checkedUser: {}
+      checkedUser: {},
+      error: false
     }
   },
   props: {
@@ -61,31 +62,34 @@ export default {
       required: true,
     }
   },
+  watch: {
+    currentUser: {
+      immediate: true,
+      handler(user) {
+        if (this.isUser && user) {
+          this.fullName = user.fullName
+          this.readersCard = user.readersCard
+        }
+      }
+    }
+  },
   methods: {
     handleCardcheck() {
       let user = getUserDataByNameAndCard(this.fullName, this.readersCard)
       if (user) {
         this.$set(this, 'checkedUser', user)
-        console.log("user found")
         setTimeout(() => {
           this.$set(this, 'checkedUser', {})
         }, 15000)
       }
       else if (!user) {
-        console.log("not a user")
+        this.error = true
+        setTimeout(() => {
+          this.error = false
+        }, 1500)
       }
     }
-  },
-  created() {
-    if (this.isUser && this.currentUser) {
-      this.fullName = this.currentUser.fullName
-      this.readersCard = this.currentUser.readersCard
-    }
-    if (this.checkedUser?.fullName) {
-      this.fullName = this.checkedUser.fullName
-      this.readersCard = this.checkedUser.readersCard
-    }
-  },
+  }
 }
 </script>
 
@@ -111,6 +115,9 @@ export default {
     flex-direction: column;
     gap: 20px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    &.error {
+      border-color: red;
+    }
 
     &-wrapper {
       padding: 20px 22.5px;
@@ -140,6 +147,9 @@ export default {
 
     &-button {
       @include cardcheck-button;
+      &.error {
+        border-color: red;
+      }
     }
   }
 }
